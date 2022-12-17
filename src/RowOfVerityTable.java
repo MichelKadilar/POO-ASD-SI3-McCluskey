@@ -1,11 +1,21 @@
 public class RowOfVerityTable {
 
-    private Integer[] numbers;
-    private Integer[] bits;
+    private Minterm[] minterms;
+    private BinaryValue binaryValue;
 
-    public RowOfVerityTable(int nbOfBitsUsed) {
-        bits = new Integer[4];
-
+    public RowOfVerityTable(Minterm[] minterms, BinaryValue binaryValue) {
+        this.minterms = minterms;
+        this.binaryValue = binaryValue;
     }
 
+    public int getNumberOfMinterms(){
+        return this.minterms.length;
+    }
+    public BinaryValue getBinaryValue() {
+        return binaryValue;
+    }
+
+    public Minterm[] getMinterms() {
+        return minterms;
+    }
 }

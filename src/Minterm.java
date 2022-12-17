@@ -3,7 +3,6 @@ public class Minterm {
     private final int mintermIntegerValue;
     private final BinaryValue mintermBinaryValueAndInfo;
 
-
     public Minterm(int minterm, BinaryValue mintermBinaryValue) {
         this.mintermIntegerValue = minterm;
         this.mintermBinaryValueAndInfo = mintermBinaryValue;

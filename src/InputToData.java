@@ -1,14 +1,17 @@
-import java.util.Scanner;
+import java.util.*;
 
 public class InputToData {
 
-    // exceptions to raise
+    // exceptions to raise when checking nextline
     public static int[] stringInputOfMintermsToIntegerArray() {
         Scanner scanner = new Scanner(System.in);
         String[] stringMinterms = scanner.nextLine().split(",");
         int[] minterms = new int[stringMinterms.length];
         for (int i = 0; i < stringMinterms.length; i++) {
             minterms[i] = stringToInteger(stringMinterms[i]);
+            if (minterms[i] >= Math.pow(2, Main.NOMBRE_DE_VARIABLES)) {
+                // raise exception
+            }
         }
         return minterms;
     }
@@ -19,20 +22,23 @@ public class InputToData {
 
     public static BinaryValue integerToBinaryValueRepresentation(int numberInInteger) {
         int[] nombreBinary = new int[Main.NOMBRE_DE_VARIABLES];
-        int i = 3;
+        int i = Main.NOMBRE_DE_VARIABLES - 1;
         int tmp = numberInInteger;
-        int numberOfOneInBinaryValue = 0;
-        int rest = 0;
+        List<Integer> indexOfOneInBinaryValue = new ArrayList<>();
+        int rest;
         while (tmp > 0) {
             rest = tmp % 2;
-            nombreBinary[i--] = rest;
+            nombreBinary[i] = rest;
             if (rest == 1) {
-                numberOfOneInBinaryValue++;
+                indexOfOneInBinaryValue.add(i);
             }
             tmp = tmp / 2;
-
+            i--;
         }
-        return new BinaryValue(nombreBinary, numberOfOneInBinaryValue);
+        Collections.sort(indexOfOneInBinaryValue);
+        return new BinaryValue(nombreBinary,
+                indexOfOneInBinaryValue,
+                new ArrayList<>());
     }
 
 }
