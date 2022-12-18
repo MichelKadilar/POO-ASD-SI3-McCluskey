@@ -1,3 +1,8 @@
+package IO;
+
+import models.BinaryValue;
+import Main.RunMcCluskey;
+
 import java.util.*;
 
 public class InputToData {
@@ -9,7 +14,7 @@ public class InputToData {
         int[] minterms = new int[stringMinterms.length];
         for (int i = 0; i < stringMinterms.length; i++) {
             minterms[i] = stringToInteger(stringMinterms[i]);
-            if (minterms[i] >= Math.pow(2, Main.NOMBRE_DE_VARIABLES)) {
+            if (minterms[i] >= Math.pow(2, RunMcCluskey.NOMBRE_DE_VARIABLES)) {
                 // raise exception
             }
         }
@@ -21,8 +26,8 @@ public class InputToData {
     }
 
     public static BinaryValue integerToBinaryValueRepresentation(int numberInInteger) {
-        int[] nombreBinary = new int[Main.NOMBRE_DE_VARIABLES];
-        int i = Main.NOMBRE_DE_VARIABLES - 1;
+        int[] nombreBinary = new int[RunMcCluskey.NOMBRE_DE_VARIABLES];
+        int i = RunMcCluskey.NOMBRE_DE_VARIABLES - 1;
         int tmp = numberInInteger;
         List<Integer> indexOfOneInBinaryValue = new ArrayList<>();
         int rest;
