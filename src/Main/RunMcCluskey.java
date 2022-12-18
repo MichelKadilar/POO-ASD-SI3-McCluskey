@@ -28,8 +28,8 @@ public class RunMcCluskey {
         }*/
         Output output = new Output();
         McCluskey mcCluskey = new McCluskey();
-        output.displayTable(mcCluskey.getCurrentTable());
+        /*output.displayTable(mcCluskey.getCurrentTable());
         VerityTable verityTable = mcCluskey.createNextTableFromCombinationOfRows();
-        output.displayTable(verityTable);
+        output.displayTable(verityTable);*/
     }
 }

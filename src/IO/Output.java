@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Output {
 
-    public void displayTable(VerityTable verityTable) {
+    public static void displayTable(VerityTable verityTable) {
         List<RowOfVerityTable> rows = verityTable.getListOfRowsOfTable();
         for (RowOfVerityTable rowOfVerityTable : rows) {
             for (Minterm minterm : rowOfVerityTable.getMinterms()) {

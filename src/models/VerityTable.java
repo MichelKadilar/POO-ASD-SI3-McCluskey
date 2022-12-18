@@ -50,6 +50,14 @@ public class VerityTable {
         return this.table.get(category);
     }
 
+    public int getNumberOfRowsWhichHaveNotBeenCombined(List<RowOfVerityTable> list) {
+        int number = 0;
+        for (RowOfVerityTable rowOfVerityTable : list) {
+            if (!rowOfVerityTable.isHasBeenCombined()) number++;
+        }
+        return number;
+    }
+
     public static class UnfoundCategoryInHashMap extends Exception {
         public UnfoundCategoryInHashMap(int category) {
             super("The category you asked : " + category + " does not exist in the current table");

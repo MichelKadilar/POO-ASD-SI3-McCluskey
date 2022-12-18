@@ -1,5 +1,6 @@
 package core;
 
+import IO.Output;
 import models.BinaryValue;
 import models.Minterm;
 import models.RowOfVerityTable;
@@ -21,10 +22,11 @@ public class McCluskey {
 
     VerityTable currentTable;
 
-    public McCluskey() {
+    public McCluskey() throws VerityTable.UnfoundCategoryInHashMap {
         notCombinedRows = new ArrayList<>();
         currentTable = new VerityTable();
         createInitialVerityTable(currentTable);
+        launchAlgorithm();
     }
 
     public VerityTable getCurrentTable() {
@@ -39,8 +41,24 @@ public class McCluskey {
             binaryValue = integerToBinaryValueRepresentation(min);
             Minterm[] mintermsArrayWithOneInitialElement = new Minterm[1];
             mintermsArrayWithOneInitialElement[0] = new Minterm(min, binaryValue);
-            rowOfVerityTableToAdd = new RowOfVerityTable(mintermsArrayWithOneInitialElement, binaryValue);
+            rowOfVerityTableToAdd = new RowOfVerityTable(mintermsArrayWithOneInitialElement, binaryValue, false);
             verityTable.addRowToTable(rowOfVerityTableToAdd);
+        }
+    }
+
+    private void launchAlgorithm() throws VerityTable.UnfoundCategoryInHashMap {
+        List<RowOfVerityTable> listOfCurrentTableRows = currentTable.getListOfRowsOfTable();
+        //currentTable.getNumberOfRowsWhichHaveNotBeenCombined(listOfCurrentTableRows) != listOfCurrentTableRows.size()
+        do {
+            Output.displayTable(this.currentTable);
+            this.currentTable = this.createNextTableFromCombinationOfRows();
+        } while (currentTable.getNumberOfRowsWhichHaveNotBeenCombined(listOfCurrentTableRows) != listOfCurrentTableRows.size());
+        for (RowOfVerityTable rowOfVerityTable : this.notCombinedRows) {
+            if (rowOfVerityTable.isHasBeenCombined()) continue;
+            for (Minterm minterm : rowOfVerityTable.getMinterms()) {
+                System.out.print(minterm.getMintermIntegerValue());
+            }
+            System.out.println("");
         }
     }
 
@@ -58,12 +76,23 @@ public class McCluskey {
                         RowOfVerityTable combinationOfTwoRows = combineTwoRows(rowOfFirstCategory, rowOfSecondCategory);
                         if (combinationOfTwoRows != null) {
                             newVerityTable.addRowToTable(combinationOfTwoRows);
+                        } else {
+                            updateNotCombinedRow(rowOfFirstCategory, rowOfSecondCategory);
                         }
                     }
                 }
             }
         }
         return newVerityTable;
+    }
+
+    private void updateNotCombinedRow(RowOfVerityTable firstRow, RowOfVerityTable secondRow) {
+        if (firstRow.isHasBeenCombined()) {
+            this.notCombinedRows.add(firstRow);
+        }
+        if (secondRow.isHasBeenCombined()) {
+            this.notCombinedRows.add(secondRow);
+        }
     }
 
     public RowOfVerityTable combineTwoRows(RowOfVerityTable firstRow, RowOfVerityTable secondRow) {
@@ -99,7 +128,9 @@ public class McCluskey {
                 for (Minterm minterm : secondRow.getMinterms()) {
                     mintermsCombination[indexOfMintermsCombination++] = minterm;
                 }
-                RowOfVerityTable rowOfVerityTableCopyingFirstRow = new RowOfVerityTable(mintermsCombination, binaryValueOfFirstRow);
+                firstRow.setIsHasBeenCombined();
+                secondRow.setIsHasBeenCombined();
+                RowOfVerityTable rowOfVerityTableCopyingFirstRow = new RowOfVerityTable(mintermsCombination, binaryValueOfFirstRow, false);
                 rowOfVerityTableCopyingFirstRow.getBinaryValue().updateBinaryValueWithAMinus(indexOfTheOneToModify);
                 return rowOfVerityTableCopyingFirstRow;
             }
