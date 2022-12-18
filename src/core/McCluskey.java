@@ -54,6 +54,7 @@ public class McCluskey {
             this.currentTable = this.createNextTableFromCombinationOfRows();
             listOfCurrentTableRows = this.currentTable.getListOfRowsOfTable();
         } while (currentTable.getNumberOfRowsWhichHaveNotBeenCombined(listOfCurrentTableRows) != listOfCurrentTableRows.size());
+        // We have to do it one last time so that we can get the prime implicants of the last table got
         Output.displayTable(this.currentTable);
         this.currentTable = this.createNextTableFromCombinationOfRows();
         displayPrimeImplicants(this.notCombinedRows);
