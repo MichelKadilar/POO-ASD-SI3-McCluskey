@@ -19,11 +19,13 @@ public class McCluskey {
     private static final int BIT_AT_ZERO = 0;
     private static final int BIT_AT_MINUS = -1;
 
-    List<RowOfVerityTable> notCombinedRows;
+    List<RowOfVerityTable> cacheOfSupposedlyNotCombinedRows;
 
+    List<RowOfVerityTable> notCombinedRows;
     VerityTable currentTable;
 
     public McCluskey() throws VerityTable.UnfoundCategoryInHashMap {
+        cacheOfSupposedlyNotCombinedRows = new ArrayList<>();
         notCombinedRows = new ArrayList<>();
         currentTable = new VerityTable();
         createInitialVerityTable(currentTable);
@@ -51,24 +53,37 @@ public class McCluskey {
         List<RowOfVerityTable> listOfCurrentTableRows;
         do {
             Output.displayTable(this.currentTable);
-            this.currentTable = this.createNextTableFromCombinationOfRows();
+            this.cacheOfSupposedlyNotCombinedRows = this.getPrimeImplicants(this.cacheOfSupposedlyNotCombinedRows);
             listOfCurrentTableRows = this.currentTable.getListOfRowsOfTable();
-        } while (currentTable.getNumberOfRowsWhichHaveNotBeenCombined(listOfCurrentTableRows) != listOfCurrentTableRows.size());
+            this.currentTable = this.createNextTableFromCombinationOfRows();
+        } while (this.cacheOfSupposedlyNotCombinedRows.size() != listOfCurrentTableRows.size());
         // We have to do it one last time so that we can get the prime implicants of the last table got
         Output.displayTable(this.currentTable);
         this.currentTable = this.createNextTableFromCombinationOfRows();
+        //this.currentTable = this.createNextTableFromCombinationOfRows();
+        this.notCombinedRows = getPrimeImplicants(this.cacheOfSupposedlyNotCombinedRows);
         displayPrimeImplicants(this.notCombinedRows);
+    }
+
+    private List<RowOfVerityTable> getPrimeImplicants(List<RowOfVerityTable> cacheOfSupposedlyNotCombinedRows) {
+        List<RowOfVerityTable> list = new ArrayList<>();
+        for (RowOfVerityTable cacheOfSupposedlyNotCombinedRow : cacheOfSupposedlyNotCombinedRows) {
+            if (!cacheOfSupposedlyNotCombinedRow.isHasBeenCombined()) {
+                list.add(cacheOfSupposedlyNotCombinedRow);
+            }
+        }
+        return list;
     }
 
     public VerityTable createNextTableFromCombinationOfRows() throws VerityTable.UnfoundCategoryInHashMap {
         VerityTable newVerityTable = new VerityTable();
         List<RowOfVerityTable> rowsOfFirstCategory;
         List<RowOfVerityTable> rowsOfNextCategory;
-        for (int category : this.getCurrentTable().getTable().keySet()) {
-            rowsOfFirstCategory = this.getCurrentTable().getRowsOfCategory(category);
+        for (int category : this.currentTable.getTable().keySet()) {
+            rowsOfFirstCategory = this.currentTable.getRowsOfCategory(category);
             if (this.currentTable.getTable().containsKey(category + 1)) {
                 // if we are here, then there is two successives categories (one 1 of difference)
-                rowsOfNextCategory = this.getCurrentTable().getRowsOfCategory(category + 1);
+                rowsOfNextCategory = this.currentTable.getRowsOfCategory(category + 1);
                 for (RowOfVerityTable rowOfFirstCategory : rowsOfFirstCategory) {
                     for (RowOfVerityTable rowOfSecondCategory : rowsOfNextCategory) {
                         RowOfVerityTable combinationOfTwoRows = combineTwoRows(rowOfFirstCategory, rowOfSecondCategory);
@@ -82,7 +97,7 @@ public class McCluskey {
             } else {
                 for (RowOfVerityTable rowOfFirstCategory : rowsOfFirstCategory) {
                     if (!rowOfFirstCategory.isHasBeenCombined()) {
-                        this.notCombinedRows.add(rowOfFirstCategory);
+                        this.cacheOfSupposedlyNotCombinedRows.add(rowOfFirstCategory);
                     }
                 }
             }
@@ -91,11 +106,11 @@ public class McCluskey {
     }
 
     private void updateNotCombinedRow(RowOfVerityTable firstRow, RowOfVerityTable secondRow) {
-        if (firstRow.isHasBeenCombined()) {
-            this.notCombinedRows.add(firstRow);
+        if (!firstRow.isHasBeenCombined()) {
+            this.cacheOfSupposedlyNotCombinedRows.add(firstRow);
         }
-        if (secondRow.isHasBeenCombined()) {
-            this.notCombinedRows.add(secondRow);
+        if (!secondRow.isHasBeenCombined()) {
+            this.cacheOfSupposedlyNotCombinedRows.add(secondRow);
         }
     }
 

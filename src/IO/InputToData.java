@@ -1,9 +1,12 @@
 package IO;
 
-import models.BinaryValue;
 import Main.RunMcCluskey;
+import models.BinaryValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
 
 public class InputToData {
 

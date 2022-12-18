@@ -1,7 +1,5 @@
 package models;
 
-import java.util.Objects;
-
 public class Minterm {
 
     private final int mintermIntegerValue;
