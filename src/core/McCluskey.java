@@ -44,53 +44,66 @@ public class McCluskey {
         }
     }
 
-    public void createNextTableFromCombinationOfRows(){
-        for(RowOfVerityTable rowOfVerityTable: this.currentTable.getListOfRowsOfTable()){
-
+    public VerityTable createNextTableFromCombinationOfRows() throws VerityTable.UnfoundCategoryInHashMap {
+        VerityTable newVerityTable = new VerityTable();
+        List<RowOfVerityTable> rowsOfFirstCategory;
+        List<RowOfVerityTable> rowsOfNextCategory;
+        for (int category : this.getCurrentTable().getTable().keySet()) {
+            if (this.currentTable.getTable().containsKey(category) && this.currentTable.getTable().containsKey(category + 1)) {
+                // if we are here, then there is two successives categories (one 1 of difference)
+                rowsOfFirstCategory = this.getCurrentTable().getRowsOfCategory(category);
+                rowsOfNextCategory = this.getCurrentTable().getRowsOfCategory(category + 1);
+                for (RowOfVerityTable rowOfFirstCategory : rowsOfFirstCategory) {
+                    for (RowOfVerityTable rowOfSecondCategory : rowsOfNextCategory) {
+                        RowOfVerityTable combinationOfTwoRows = combineTwoRows(rowOfFirstCategory, rowOfSecondCategory);
+                        if (combinationOfTwoRows != null) {
+                            newVerityTable.addRowToTable(combinationOfTwoRows);
+                        }
+                    }
+                }
+            }
         }
+        return newVerityTable;
     }
 
     public RowOfVerityTable combineTwoRows(RowOfVerityTable firstRow, RowOfVerityTable secondRow) {
-        BinaryValue binaryValueOfFirstRow = firstRow.getBinaryValue();
+        BinaryValue binaryValueOfFirstRow = new BinaryValue(firstRow.getBinaryValue());
         BinaryValue binaryValueOfSecondRow = secondRow.getBinaryValue();
         // second row has more ones than the first because it has been sorted before
-        int differenceOfNumberOfOnes = binaryValueOfSecondRow.getNumberOfOnes() - binaryValueOfFirstRow.getNumberOfOnes();
         int numberOfOnesOfDifference = 0; // two rows can have one 1 of diff but not have any one in common
         int indexOfTheOneToModify = -1;
         boolean areMinusCorrespondingBetweenRows = true;
-        if (differenceOfNumberOfOnes == 1) { // only the number of one, not their position, they can have not any in common
-            for (int index : binaryValueOfSecondRow.getIndexOfOnes()) {
-                if (binaryValueOfFirstRow.getBinaryValue()[index] == BIT_AT_ZERO) {
-                    indexOfTheOneToModify = index;
-                    numberOfOnesOfDifference++;
-                }
-                if (numberOfOnesOfDifference > 1 || binaryValueOfFirstRow.getBinaryValue()[index] == BIT_AT_MINUS) {
-                    indexOfTheOneToModify = -1;
+        for (int index : binaryValueOfSecondRow.getIndexOfOnes()) {
+            if (binaryValueOfFirstRow.getBinaryValue()[index] == BIT_AT_ZERO) {
+                indexOfTheOneToModify = index;
+                numberOfOnesOfDifference++;
+            }
+            if (numberOfOnesOfDifference > 1 || binaryValueOfFirstRow.getBinaryValue()[index] == BIT_AT_MINUS) {
+                indexOfTheOneToModify = -1;
+                break;
+            }
+        }
+        if (indexOfTheOneToModify != -1) {
+            for (int index : binaryValueOfSecondRow.getIndexOfMinus()) {
+                if (binaryValueOfFirstRow.getBinaryValue()[index] != BIT_AT_MINUS) {
+                    areMinusCorrespondingBetweenRows = false;
                     break;
                 }
             }
-            if (indexOfTheOneToModify != -1) {
-                for (int index : binaryValueOfSecondRow.getIndexOfMinus()) {
-                    if (binaryValueOfFirstRow.getBinaryValue()[index] != BIT_AT_MINUS) {
-                        areMinusCorrespondingBetweenRows = false;
-                        break;
-                    }
+            if (areMinusCorrespondingBetweenRows) {
+                Minterm[] mintermsCombination = new Minterm[firstRow.getNumberOfMinterms() + secondRow.getNumberOfMinterms()];
+                int indexOfMintermsCombination = 0;
+                for (Minterm minterm : firstRow.getMinterms()) {
+                    mintermsCombination[indexOfMintermsCombination++] = minterm;
                 }
-                if (areMinusCorrespondingBetweenRows) {
-                    Minterm[] mintermsCombination = new Minterm[firstRow.getNumberOfMinterms() + secondRow.getNumberOfMinterms()];
-                    int indexOfMintermsCombination = 0;
-                    for (Minterm minterm : firstRow.getMinterms()) {
-                        mintermsCombination[indexOfMintermsCombination++] = minterm;
-                    }
-                    for (Minterm minterm : secondRow.getMinterms()) {
-                        mintermsCombination[indexOfMintermsCombination++] = minterm;
-                    }
-                    firstRow.getBinaryValue().updateBinaryValueWithAMinus(indexOfTheOneToModify);
-                    return new RowOfVerityTable(mintermsCombination, firstRow.getBinaryValue());
+                for (Minterm minterm : secondRow.getMinterms()) {
+                    mintermsCombination[indexOfMintermsCombination++] = minterm;
                 }
+                RowOfVerityTable rowOfVerityTableCopyingFirstRow = new RowOfVerityTable(mintermsCombination, binaryValueOfFirstRow);
+                rowOfVerityTableCopyingFirstRow.getBinaryValue().updateBinaryValueWithAMinus(indexOfTheOneToModify);
+                return rowOfVerityTableCopyingFirstRow;
             }
         }
         return null;
     }
-
 }

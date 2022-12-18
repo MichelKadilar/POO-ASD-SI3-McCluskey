@@ -2,6 +2,7 @@ package Main;
 
 import IO.Output;
 import core.McCluskey;
+import models.VerityTable;
 
 import java.util.Scanner;
 
@@ -10,7 +11,7 @@ public class RunMcCluskey {
 
     public static int NOMBRE_DE_VARIABLES;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws VerityTable.UnfoundCategoryInHashMap {
         Scanner scanner = new Scanner(System.in);
         String numberOfVariables = scanner.nextLine();
         NOMBRE_DE_VARIABLES = Integer.parseInt(numberOfVariables);
@@ -28,5 +29,7 @@ public class RunMcCluskey {
         Output output = new Output();
         McCluskey mcCluskey = new McCluskey();
         output.displayTable(mcCluskey.getCurrentTable());
+        VerityTable verityTable = mcCluskey.createNextTableFromCombinationOfRows();
+        output.displayTable(verityTable);
     }
 }

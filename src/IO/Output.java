@@ -11,7 +11,7 @@ public class Output {
     public void displayTable(VerityTable verityTable) {
         List<RowOfVerityTable> rows = verityTable.getListOfRowsOfTable();
         for (RowOfVerityTable rowOfVerityTable : rows) {
-            for(Minterm minterm: rowOfVerityTable.getMinterms()){
+            for (Minterm minterm : rowOfVerityTable.getMinterms()) {
                 System.out.print(minterm.getMintermIntegerValue());
             }
             System.out.print(" : ");
