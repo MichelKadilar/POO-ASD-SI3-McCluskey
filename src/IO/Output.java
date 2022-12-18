@@ -22,4 +22,14 @@ public class Output {
         }
     }
 
+    public static void displayPrimeImplicants(List<RowOfVerityTable> notCombinedRows) {
+        for (RowOfVerityTable rowOfVerityTable : notCombinedRows) {
+            if (rowOfVerityTable.isHasBeenCombined()) continue;
+            for (Minterm minterm : rowOfVerityTable.getMinterms()) {
+                System.out.print(minterm.getMintermIntegerValue());
+            }
+            System.out.println("");
+        }
+    }
+
 }

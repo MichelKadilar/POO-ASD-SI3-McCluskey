@@ -11,6 +11,7 @@ import java.util.List;
 
 import static IO.InputToData.integerToBinaryValueRepresentation;
 import static IO.InputToData.stringInputOfMintermsToIntegerArray;
+import static IO.Output.displayPrimeImplicants;
 
 public class McCluskey {
 
@@ -47,19 +48,15 @@ public class McCluskey {
     }
 
     private void launchAlgorithm() throws VerityTable.UnfoundCategoryInHashMap {
-        List<RowOfVerityTable> listOfCurrentTableRows = currentTable.getListOfRowsOfTable();
-        //currentTable.getNumberOfRowsWhichHaveNotBeenCombined(listOfCurrentTableRows) != listOfCurrentTableRows.size()
+        List<RowOfVerityTable> listOfCurrentTableRows;
         do {
             Output.displayTable(this.currentTable);
             this.currentTable = this.createNextTableFromCombinationOfRows();
+            listOfCurrentTableRows = this.currentTable.getListOfRowsOfTable();
         } while (currentTable.getNumberOfRowsWhichHaveNotBeenCombined(listOfCurrentTableRows) != listOfCurrentTableRows.size());
-        for (RowOfVerityTable rowOfVerityTable : this.notCombinedRows) {
-            if (rowOfVerityTable.isHasBeenCombined()) continue;
-            for (Minterm minterm : rowOfVerityTable.getMinterms()) {
-                System.out.print(minterm.getMintermIntegerValue());
-            }
-            System.out.println("");
-        }
+        Output.displayTable(this.currentTable);
+        this.currentTable = this.createNextTableFromCombinationOfRows();
+        displayPrimeImplicants(this.notCombinedRows);
     }
 
     public VerityTable createNextTableFromCombinationOfRows() throws VerityTable.UnfoundCategoryInHashMap {
@@ -67,9 +64,9 @@ public class McCluskey {
         List<RowOfVerityTable> rowsOfFirstCategory;
         List<RowOfVerityTable> rowsOfNextCategory;
         for (int category : this.getCurrentTable().getTable().keySet()) {
-            if (this.currentTable.getTable().containsKey(category) && this.currentTable.getTable().containsKey(category + 1)) {
+            rowsOfFirstCategory = this.getCurrentTable().getRowsOfCategory(category);
+            if (this.currentTable.getTable().containsKey(category + 1)) {
                 // if we are here, then there is two successives categories (one 1 of difference)
-                rowsOfFirstCategory = this.getCurrentTable().getRowsOfCategory(category);
                 rowsOfNextCategory = this.getCurrentTable().getRowsOfCategory(category + 1);
                 for (RowOfVerityTable rowOfFirstCategory : rowsOfFirstCategory) {
                     for (RowOfVerityTable rowOfSecondCategory : rowsOfNextCategory) {
@@ -79,6 +76,12 @@ public class McCluskey {
                         } else {
                             updateNotCombinedRow(rowOfFirstCategory, rowOfSecondCategory);
                         }
+                    }
+                }
+            } else {
+                for (RowOfVerityTable rowOfFirstCategory : rowsOfFirstCategory) {
+                    if (!rowOfFirstCategory.isHasBeenCombined()) {
+                        this.notCombinedRows.add(rowOfFirstCategory);
                     }
                 }
             }
